@@ -1,4 +1,4 @@
-﻿import { isApiError } from '../api/ApiError'
+import { isApiError } from '../api/ApiError'
 
 export function getErrorMessage(error: unknown): string {
   if (isApiError(error)) {
