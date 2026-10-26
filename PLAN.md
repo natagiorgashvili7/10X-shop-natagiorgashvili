@@ -1,23 +1,27 @@
-# PLAN: 10X Shop (CORE first)
+# PLAN: 10X Shop (CORE first, then FULL)
 
 ## Goal & Scope
 Build "10X Shop", an e-commerce SPA with React 19 + TypeScript (strict) + Tailwind CSS v4,
 using the DummyJSON products API. Login and Checkout are local simulations (no real auth/payment).
 
-**CORE (this plan):** Login (Context), Catalog, Product Details, Cart (add / quantity / remove / total),
-Checkout (controlled form + local confirmation), responsive UI, loading/error/empty states, deploy.
-**FULL / BONUS:** not started. Only considered after the CORE checklist is complete.
+**CORE:** Login (Context), Catalog, Product Details, Cart (add / quantity / remove / total),
+Checkout (controlled form + local confirmation), responsive UI, loading/error/empty states,
+Error Boundary, DEBUG-LOG, deploy.
+**FULL:** only after that day's CORE works (search/filter/sort/pagination, reviews, promo,
+ApiClient/OOP, Formik + Yup, Orders, Profile, @theme, lazy loading, Lighthouse).
 
-## Timeline (deadline: 6 Nov 2026, 23:59 GMT+4)
-1. 23 Oct | Vite + TS strict + Tailwind v4, PLAN.md, folders, `types/`
-2. 26 Oct | Router, Layout (Header/Footer/404), AuthContext, Login form
-3. 27 Oct | `api/`, Catalog, ProductCard/Grid, loading/error/empty
-4. 28 Oct | Product Details, image/quantity state, Add to Cart
-5. 29 Oct | CartContext, Cart page, stepper, remove, totals
-6. 30 Oct | Checkout, protected redirect, validation, confirmation
-7. 31 Oct | Responsive audit, typecheck, build, deploy, README, REPORT
+## Timeline: 7 working days (26 Oct - 1 Nov), buffer 2-6 Nov (deadline 6 Nov, 23:59 GMT+4)
+| Day | Date | CORE | FULL |
+|-----|------|------|------|
+| 1 | 26 Oct | Router, Layout, 404, AuthContext, Login | - |
+| 2 | 27 Oct | API, Catalog, ProductCard/Grid, states | ApiClient, ApiError, generics |
+| 3 | 28 Oct | Product Details, Add to Cart | Search, category, sort, pagination, URL state |
+| 4 | 29 Oct | CartContext, Cart page | Gallery, reviews, related |
+| 5 | 30 Oct | Checkout, guard, validation | Promo, OOP classes, type guards |
+| 6 | 31 Oct | Error Boundary, DEBUG-LOG | Formik+Yup, Orders, Profile, @theme |
+| 7 | 1 Nov | Responsive audit, deploy, README, REPORT | Lazy loading, Lighthouse, compat report |
 
-Remaining days until 6 Nov are buffer for fixes and optional FULL work.
+Rule: FULL starts each day only after that day's CORE works. Each FULL feature uses its own branch and PR.
 
 ## Risks
 1. **DummyJSON unavailable or slow** -> show Error state; keep a small local JSON fallback if needed.
