@@ -5,6 +5,8 @@ import Loading from '../components/ui/Loading'
 import ErrorMessage from '../components/ui/ErrorMessage'
 import type { AsyncState } from '../types/api'
 import type { ProductsResponse } from '../types/product'
+import { getErrorMessage } from '../utils/error'
+
 
 const PAGE_SIZE = 12
 
@@ -16,9 +18,9 @@ export default function CatalogPage() {
 
     getProducts({ limit: PAGE_SIZE, skip: 0 }, controller.signal)
       .then((data) => setState({ status: 'success', data }))
-      .catch(() => {
+      .catch((error: unknown) => {
         if (controller.signal.aborted) return
-        setState({ status: 'error', message: 'Could not load products. Please try again later.' })
+        setState({ status: 'error', message: getErrorMessage(error) })
       })
 
     return () => controller.abort()
