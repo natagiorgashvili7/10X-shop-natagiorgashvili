@@ -1,21 +1,13 @@
 import { Link } from 'react-router-dom'
 import type { Product } from '../../types/product'
 import { discountedPrice, formatPrice } from '../../utils/format'
+import StockBadge from './StockBadge';
 
 interface ProductCardProps {
   product: Product
   onAdd?: (product: Product) => void
 }
 
-function StockBadge({ stock }: { stock: number }) {
-  if (stock === 0) {
-    return <span className="text-xs font-medium text-red-600">Out of stock</span>
-  }
-  if (stock <= 5) {
-    return <span className="text-xs font-medium text-orange-600">Only {stock} left!</span>
-  }
-  return <span className="text-xs font-medium text-green-600">In stock</span>
-}
 
 export default function ProductCard({ product, onAdd }: ProductCardProps) {
   const finalPrice = discountedPrice(product.price, product.discountPercentage)
