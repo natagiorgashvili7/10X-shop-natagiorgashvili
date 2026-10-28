@@ -4,6 +4,8 @@ import { useCart } from '../../context/useCart'
 import type { AddToCartResult } from '../../types/cart'
 import type { Product } from '../../types/product'
 import { discountedPrice, formatPrice } from '../../utils/format'
+import RelatedProducts from './RelatedProducts'
+import ReviewsSection from './ReviewsSection'
 import StockBadge from './StockBadge'
 
 interface ProductDetailsProps {
@@ -147,11 +149,13 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
               className={`mt-3 text-sm ${notice.ok ? 'text-green-700' : 'text-red-600'}`}
             >
               {notice.message}
-
             </p>
           )}
         </div>
       </div>
+
+      <ReviewsSection productId={product.id} apiReviews={product.reviews ?? []} />
+      <RelatedProducts category={product.category} currentId={product.id} />
     </section>
   )
 }
