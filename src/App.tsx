@@ -1,12 +1,15 @@
 import { BrowserRouter } from 'react-router-dom'
 import AuthProvider from './context/AuthProvider'
+import CartProvider from './context/CartProvider'
 import AppRoutes from './routes/AppRoutes'
 
 export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <AppRoutes />
+        <CartProvider>
+          <AppRoutes />
+        </CartProvider>
       </AuthProvider>
     </BrowserRouter>
   )
