@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { useCart } from '../../context/useCart'
+import type { AddToCartResult } from '../../types/cart'
 import type { Product } from '../../types/product'
 import { discountedPrice, formatPrice } from '../../utils/format'
 import StockBadge from './StockBadge'
@@ -10,18 +12,19 @@ interface ProductDetailsProps {
 
 export default function ProductDetails({ product }: ProductDetailsProps) {
   const navigate = useNavigate()
+  const { addItem } = useCart()
   const images = product.images.length > 0 ? product.images : [product.thumbnail]
 
   const [selectedImage, setSelectedImage] = useState<string>(images[0])
   const [quantity, setQuantity] = useState(1)
-  const [notice, setNotice] = useState('')
+  const [notice, setNotice] = useState<AddToCartResult | null>(null)
 
   const finalPrice = discountedPrice(product.price, product.discountPercentage)
   const hasDiscount = product.discountPercentage >= 1
   const outOfStock = product.stock === 0
 
   function handleAddToCart() {
-    setNotice(`Selected ${quantity} × ${product.title}. The cart is connected on Day 4.`)
+    setNotice(addItem(product, quantity))
   }
 
   return (
@@ -139,8 +142,12 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
           </div>
 
           {notice && (
-            <p role="status" className="mt-3 text-sm text-green-700">
-              {notice}
+            <p
+              role="status"
+              className={`mt-3 text-sm ${notice.ok ? 'text-green-700' : 'text-red-600'}`}
+            >
+              {notice.message}
+
             </p>
           )}
         </div>
