@@ -9,8 +9,17 @@ export interface CheckoutFormValues {
 
 export type CheckoutFormErrors = Partial<Record<keyof CheckoutFormValues, string>>
 
-export interface PlacedOrder {
+export type ShippingInfo = CheckoutFormValues
+
+export type OrderStatus = 'Processing' | 'Shipped' | 'Delivered'
+
+export interface OrderData {
+  id: number
+  number: string
   items: CartItem[]
+  shipping: ShippingInfo
+  subtotal: number
+  discount: number
   total: number
-  shipping: CheckoutFormValues
+  placedAt: string
 }

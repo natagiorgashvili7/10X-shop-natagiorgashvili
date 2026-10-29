@@ -3,7 +3,9 @@ import type { ChangeEvent, FormEvent } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import { useAuth } from '../context/useAuth'
 import { useCart } from '../context/useCart'
-import type { CheckoutFormErrors, CheckoutFormValues, PlacedOrder } from '../types/order'
+import { Order } from '../models/Order'
+import { ordersStorage } from '../models/storage'
+import type { CheckoutFormErrors, CheckoutFormValues } from '../types/order'
 import { lineTotal } from '../utils/cart'
 import { formatPrice } from '../utils/format'
 import { validateCheckout } from '../utils/validation'
@@ -29,7 +31,7 @@ const inputClass = (hasError: boolean): string =>
 
 export default function CheckoutPage() {
   const { user } = useAuth()
-  const { items, total, clearCart } = useCart()
+  const { cart, items, total, discount, clearCart } = useCart()
 
   const [values, setValues] = useState<CheckoutFormValues>({
     fullName: user.username,
@@ -39,7 +41,7 @@ export default function CheckoutPage() {
   })
   const [errors, setErrors] = useState<CheckoutFormErrors>({})
   const [submitting, setSubmitting] = useState(false)
-  const [placed, setPlaced] = useState<PlacedOrder | null>(null)
+  const [placed, setPlaced] = useState<Order | null>(null)
   const timer = useRef<number | undefined>(undefined)
 
   useEffect(() => {
@@ -61,9 +63,12 @@ export default function CheckoutPage() {
     if (Object.keys(nextErrors).length > 0) return
 
     setSubmitting(true)
-    // Local simulation: nothing is sent to a server.
+    // Local simulation: the order is created and saved in the browser only.
     timer.current = window.setTimeout(() => {
-      setPlaced({ items, total, shipping: values })
+      const existing = ordersStorage.get() ?? []
+      const order = Order.create(cart, values, existing.length + 1)
+      ordersStorage.set([order.toJSON(), ...existing])
+      setPlaced(order)
       clearCart()
       setSubmitting(false)
     }, 600)
@@ -73,6 +78,7 @@ export default function CheckoutPage() {
     return (
       <section className="mx-auto max-w-xl rounded-lg border border-slate-200 bg-white p-6">
         <h1 className="text-2xl font-bold text-green-700">Thank you! Your order has been placed.</h1>
+        <p className="mt-1 text-sm text-slate-500">Order #{placed.number}</p>
         <p className="mt-2 text-slate-600">
           Confirmation for {placed.shipping.fullName} ({placed.shipping.email}). Shipping to{' '}
           {placed.shipping.address}, {placed.shipping.city}.
@@ -89,7 +95,13 @@ export default function CheckoutPage() {
           ))}
         </ul>
 
-        <p className="mt-4 flex justify-between text-lg font-bold">
+        {placed.discount > 0 && (
+          <p className="mt-3 flex justify-between text-sm text-green-700">
+            <span>Discount</span>
+            <span>−{formatPrice(placed.discount)}</span>
+          </p>
+        )}
+        <p className="mt-2 flex justify-between text-lg font-bold">
           <span>Total</span>
           <span>{formatPrice(placed.total)}</span>
         </p>
@@ -166,6 +178,12 @@ export default function CheckoutPage() {
               </li>
             ))}
           </ul>
+          {discount > 0 && (
+            <p className="mt-3 flex justify-between text-sm text-green-700">
+              <span>Discount</span>
+              <span>−{formatPrice(discount)}</span>
+            </p>
+          )}
           <p className="mt-3 flex justify-between border-t border-slate-200 pt-3 text-base font-bold">
             <span>Total</span>
             <span>{formatPrice(total)}</span>
