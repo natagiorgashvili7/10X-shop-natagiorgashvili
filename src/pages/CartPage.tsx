@@ -1,3 +1,5 @@
+import { useState } from 'react'
+import type { FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useCart } from '../context/useCart'
 import { lineTotal, unitPrice } from '../utils/cart'
@@ -7,13 +9,34 @@ const stepperButton =
   'h-10 w-10 text-lg hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-400 disabled:cursor-not-allowed disabled:opacity-40'
 
 export default function CartPage() {
-  const { items, itemCount, subtotal, setQuantity, removeItem, clearCart } = useCart()
+  const {
+    items,
+    itemCount,
+    subtotal,
+    discount,
+    total,
+    promoCode,
+    setQuantity,
+    removeItem,
+    clearCart,
+    applyPromo,
+    removePromo,
+  } = useCart()
   const navigate = useNavigate()
+  const [promoInput, setPromoInput] = useState('')
+  const [promoError, setPromoError] = useState('')
 
   function handleClear() {
     if (window.confirm('Clear the cart? This cannot be undone.')) {
       clearCart()
     }
+  }
+
+  function handleApplyPromo(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    const result = applyPromo(promoInput)
+    setPromoError(result.ok ? '' : result.message)
+    if (result.ok) setPromoInput('')
   }
 
   if (items.length === 0) {
@@ -110,7 +133,36 @@ export default function CartPage() {
 
         <aside className="h-fit rounded-lg border border-slate-200 bg-white p-4">
           <h2 className="text-lg font-semibold">Summary</h2>
-          <dl className="mt-3 space-y-2 text-sm">
+
+          <form onSubmit={handleApplyPromo} noValidate className="mt-3">
+            <label htmlFor="promo" className="block text-sm font-medium">
+              Promo code
+            </label>
+            <div className="mt-1 flex gap-2">
+              <input
+                id="promo"
+                type="text"
+                value={promoInput}
+                onChange={(event) => setPromoInput(event.target.value)}
+                aria-invalid={promoError !== ''}
+                aria-describedby={promoError ? 'promo-error' : undefined}
+                className="w-full rounded border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              />
+              <button
+                type="submit"
+                className="rounded border border-slate-300 bg-white px-3 py-2 text-sm hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              >
+                Apply
+              </button>
+            </div>
+            {promoError && (
+              <p id="promo-error" className="mt-1 text-sm text-red-600">
+                {promoError}
+              </p>
+            )}
+          </form>
+
+          <dl className="mt-4 space-y-2 text-sm">
             <div className="flex justify-between">
               <dt className="text-slate-600">Items</dt>
               <dd>{itemCount}</dd>
@@ -119,11 +171,27 @@ export default function CartPage() {
               <dt className="text-slate-600">Subtotal</dt>
               <dd>{formatPrice(subtotal)}</dd>
             </div>
+            {promoCode && (
+              <div className="flex items-center justify-between text-green-700">
+                <dt>
+                  Discount ({promoCode} −10%){' '}
+                  <button
+                    type="button"
+                    onClick={removePromo}
+                    className="underline focus:outline-none focus:ring-2 focus:ring-green-300"
+                  >
+                    Remove
+                  </button>
+                </dt>
+                <dd>−{formatPrice(discount)}</dd>
+              </div>
+            )}
             <div className="flex justify-between border-t border-slate-200 pt-2 text-base font-bold">
               <dt>Total</dt>
-              <dd>{formatPrice(subtotal)}</dd>
+              <dd>{formatPrice(total)}</dd>
             </div>
           </dl>
+
           <button
             type="button"
             onClick={() => navigate('/checkout')}
