@@ -1,21 +1,26 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
 import { CartContext } from './cart-context'
 import type { CartContextValue } from './cart-context'
+import { Cart } from '../models/Cart'
+import { cartStorage } from '../models/storage'
 import type { AddToCartResult, CartItem } from '../types/cart'
 import type { Product } from '../types/product'
-import { cartItemCount, cartSubtotal } from '../utils/cart'
-
-const PROMO_CODE = '10X10'
-const PROMO_RATE = 0.1
 
 interface CartProviderProps {
   children: ReactNode
 }
 
 export default function CartProvider({ children }: CartProviderProps) {
-  const [items, setItems] = useState<CartItem[]>([])
-  const [promoCode, setPromoCode] = useState<string | null>(null)
+  const [items, setItems] = useState<CartItem[]>(() => cartStorage.get()?.items ?? [])
+  const [promoCode, setPromoCode] = useState<string | null>(
+    () => cartStorage.get()?.promoCode ?? null,
+  )
+
+  // Persist after every change (the storage service is the only door to localStorage).
+  useEffect(() => {
+    cartStorage.set({ items, promoCode })
+  }, [items, promoCode])
 
   function addItem(product: Product, quantity: number): AddToCartResult {
     if (product.stock === 0) {
@@ -76,10 +81,10 @@ export default function CartProvider({ children }: CartProviderProps) {
   }
 
   function applyPromo(code: string): AddToCartResult {
-    if (code.trim().toUpperCase() !== PROMO_CODE) {
+    if (!Cart.isValidPromo(code)) {
       return { ok: false, message: 'Invalid promo code' }
     }
-    setPromoCode(PROMO_CODE)
+    setPromoCode(Cart.PROMO_CODE)
     return { ok: true, message: 'Promo code applied' }
   }
 
@@ -87,15 +92,15 @@ export default function CartProvider({ children }: CartProviderProps) {
     setPromoCode(null)
   }
 
-  const subtotal = cartSubtotal(items)
-  const discount = promoCode ? Math.round(subtotal * PROMO_RATE * 100) / 100 : 0
+  const cart = new Cart(items, promoCode)
 
   const value: CartContextValue = {
+    cart,
     items,
-    itemCount: cartItemCount(items),
-    subtotal,
-    discount,
-    total: Math.round((subtotal - discount) * 100) / 100,
+    itemCount: cart.itemCount,
+    subtotal: cart.subtotal(),
+    discount: cart.discount(),
+    total: cart.total(),
     promoCode,
     addItem,
     setQuantity,

@@ -1,8 +1,10 @@
 import { createContext } from 'react'
+import type { Cart } from '../models/Cart'
 import type { AddToCartResult, CartItem } from '../types/cart'
 import type { Product } from '../types/product'
 
 export interface CartContextValue {
+  cart: Cart
   items: CartItem[]
   itemCount: number
   subtotal: number
