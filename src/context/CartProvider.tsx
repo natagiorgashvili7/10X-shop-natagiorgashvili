@@ -6,12 +6,16 @@ import type { AddToCartResult, CartItem } from '../types/cart'
 import type { Product } from '../types/product'
 import { cartItemCount, cartSubtotal } from '../utils/cart'
 
+const PROMO_CODE = '10X10'
+const PROMO_RATE = 0.1
+
 interface CartProviderProps {
   children: ReactNode
 }
 
 export default function CartProvider({ children }: CartProviderProps) {
   const [items, setItems] = useState<CartItem[]>([])
+  const [promoCode, setPromoCode] = useState<string | null>(null)
 
   function addItem(product: Product, quantity: number): AddToCartResult {
     if (product.stock === 0) {
@@ -68,19 +72,38 @@ export default function CartProvider({ children }: CartProviderProps) {
 
   function clearCart() {
     setItems([])
+    setPromoCode(null)
   }
 
-    const subtotal = cartSubtotal(items)
-
-    const value: CartContextValue = {
-      items,
-      itemCount: cartItemCount(items),
-      subtotal,
-      total: subtotal,
-      addItem,
-      setQuantity,
-      removeItem,
-      clearCart,
+  function applyPromo(code: string): AddToCartResult {
+    if (code.trim().toUpperCase() !== PROMO_CODE) {
+      return { ok: false, message: 'Invalid promo code' }
     }
+    setPromoCode(PROMO_CODE)
+    return { ok: true, message: 'Promo code applied' }
+  }
+
+  function removePromo() {
+    setPromoCode(null)
+  }
+
+  const subtotal = cartSubtotal(items)
+  const discount = promoCode ? Math.round(subtotal * PROMO_RATE * 100) / 100 : 0
+
+  const value: CartContextValue = {
+    items,
+    itemCount: cartItemCount(items),
+    subtotal,
+    discount,
+    total: Math.round((subtotal - discount) * 100) / 100,
+    promoCode,
+    addItem,
+    setQuantity,
+    removeItem,
+    clearCart,
+    applyPromo,
+    removePromo,
+  }
+
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>
 }
