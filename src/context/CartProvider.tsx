@@ -70,15 +70,17 @@ export default function CartProvider({ children }: CartProviderProps) {
     setItems([])
   }
 
-  const value: CartContextValue = {
-    items,
-    itemCount: cartItemCount(items),
-    subtotal: cartSubtotal(items),
-    addItem,
-    setQuantity,
-    removeItem,
-    clearCart,
-  }
+    const subtotal = cartSubtotal(items)
 
+    const value: CartContextValue = {
+      items,
+      itemCount: cartItemCount(items),
+      subtotal,
+      total: subtotal,
+      addItem,
+      setQuantity,
+      removeItem,
+      clearCart,
+    }
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>
 }

@@ -6,6 +6,7 @@ export interface CartContextValue {
   items: CartItem[]
   itemCount: number
   subtotal: number
+  total: number
   addItem: (product: Product, quantity: number) => AddToCartResult
   setQuantity: (productId: number, quantity: number) => void
   removeItem: (productId: number) => void
