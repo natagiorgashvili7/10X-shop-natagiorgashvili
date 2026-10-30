@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { Order } from '../models/Order'
 import { ordersStorage } from '../models/storage'
 import type { OrderData, OrderStatus } from '../types/order'
 import { lineTotal } from '../utils/cart'
@@ -13,20 +12,7 @@ const STATUS_CLASS: Record<OrderStatus, string> = {
   Delivered: 'bg-green-100 text-green-700',
 }
 
-function toOrder(data: OrderData): Order {
-  return Order.create(
-    {
-      getItems: () => data.items,
-      subtotal: () => data.subtotal,
-      discount: () => data.discount,
-      total: () => data.total,
-    } as never,
-    data.shipping,
-    0,
-    new Date(data.placedAt),
-  )
-}
-
+// Status is never stored: it is computed from the time passed since the order was placed.
 function statusOf(data: OrderData, now: Date): OrderStatus {
   const elapsed = now.getTime() - new Date(data.placedAt).getTime()
   if (elapsed < 60_000) return 'Processing'
@@ -43,8 +29,6 @@ export default function OrdersPage() {
     const interval = window.setInterval(() => setNow(new Date()), 30_000)
     return () => window.clearInterval(interval)
   }, [])
-
-  void toOrder
 
   if (id !== undefined) {
     const order = orders.find((entry) => String(entry.id) === id)
