@@ -1,6 +1,7 @@
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/useAuth'
 import { useCart } from '../../context/useCart'
+import { useTheme } from '../../context/useTheme'
 
 const navLinkClass = ({ isActive }: { isActive: boolean }): string =>
   `rounded px-3 py-2 text-sm font-medium hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-400 ${
@@ -10,6 +11,7 @@ const navLinkClass = ({ isActive }: { isActive: boolean }): string =>
 export default function Header() {
   const { user, logout } = useAuth()
   const { itemCount } = useCart()
+  const { theme, toggleTheme } = useTheme()
   const navigate = useNavigate()
 
   function handleLogout() {
@@ -65,6 +67,15 @@ export default function Header() {
               Log in
             </NavLink>
           )}
+
+          <button
+            type="button"
+            onClick={toggleTheme}
+            aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+            className="rounded px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+          >
+            {theme === 'dark' ? 'Light' : 'Dark'}
+          </button>
         </nav>
       </div>
     </header>

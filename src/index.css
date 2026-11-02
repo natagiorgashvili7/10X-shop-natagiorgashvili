@@ -1,6 +1,26 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 @theme {
   --color-brand: #4f46e5;
   --color-brand-dark: #4338ca;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  --color-white: #1e293b;
+  --color-slate-50: #0f172a;
+  --color-slate-100: #334155;
+  --color-slate-200: #334155;
+  --color-slate-300: #475569;
+  --color-slate-500: #94a3b8;
+  --color-slate-600: #cbd5e1;
+  --color-slate-700: #e2e8f0;
+  --color-slate-900: #f8fafc;
+}
+
+/* White text on colored buttons must stay white in dark mode. */
+[data-theme="dark"] .text-white {
+  color: #ffffff;
 }
