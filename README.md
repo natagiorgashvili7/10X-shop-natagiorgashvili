@@ -74,4 +74,4 @@ Promo code for the cart: `10X10`.
 - Cart uses `useState` rather than a reducer
 
 ## Credits
-Product data: [DummyJSON](https://dummyjson.com). AI assistance (Claude) was used for planning, code review and wording; decisions and final code are my own. TODO: add anyone else who helped.
+Product data: [DummyJSON](https://dummyjson.com). AI assistance (Claude) was used for planning, code review, wording and some codes.
