@@ -17,7 +17,7 @@ Final report for the 10X Front-end graduation project. Live demo and run instruc
 
 | Metric | Value |
 |---|---|
-| Commits | |
+| Commits |62 |
 | Merged pull requests | 11 (#2–#11) |
 | CSS (gzip) | 4.67 kB |
 | `npm run typecheck`, `npm run lint`, `npm run build` | all pass |
