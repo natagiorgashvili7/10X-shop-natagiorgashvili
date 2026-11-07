@@ -8,7 +8,7 @@ import { ordersStorage } from '../models/storage'
 import type { CheckoutFormErrors, CheckoutFormValues } from '../types/order'
 import { lineTotal } from '../utils/cart'
 import { formatPrice } from '../utils/format'
-import { validateCheckout } from '../utils/validation'
+import { COUNTRIES, DEFAULT_COUNTRY, validateCheckout } from '../utils/validation'
 
 interface FieldConfig {
   name: keyof CheckoutFormValues
@@ -20,8 +20,10 @@ interface FieldConfig {
 const FIELDS: FieldConfig[] = [
   { name: 'fullName', label: 'Full name', type: 'text', autoComplete: 'name' },
   { name: 'email', label: 'Email', type: 'email', autoComplete: 'email' },
+  { name: 'phone', label: 'Phone', type: 'tel', autoComplete: 'tel' },
   { name: 'address', label: 'Address', type: 'text', autoComplete: 'street-address' },
   { name: 'city', label: 'City', type: 'text', autoComplete: 'address-level2' },
+  { name: 'postalCode', label: 'Postal code', type: 'text', autoComplete: 'postal-code' },
 ]
 
 const inputClass = (hasError: boolean): string =>
@@ -36,8 +38,11 @@ export default function CheckoutPage() {
   const [values, setValues] = useState<CheckoutFormValues>({
     fullName: user.username,
     email: '',
+    phone: '',
     address: '',
     city: '',
+    postalCode: '',
+    country: DEFAULT_COUNTRY,
   })
   const [errors, setErrors] = useState<CheckoutFormErrors>({})
   const [submitting, setSubmitting] = useState(false)
@@ -49,7 +54,7 @@ export default function CheckoutPage() {
     return () => window.clearTimeout(timers.current)
   }, [])
 
-  function handleChange(event: ChangeEvent<HTMLInputElement>) {
+  function handleChange(event: ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
     const { name, value } = event.target
     setValues((previous) => ({ ...previous, [name]: value }))
   }
@@ -81,7 +86,8 @@ export default function CheckoutPage() {
         <p className="mt-1 text-sm text-slate-500">Order #{placed.number}</p>
         <p className="mt-2 text-slate-600">
           Confirmation for {placed.shipping.fullName} ({placed.shipping.email}). Shipping to{' '}
-          {placed.shipping.address}, {placed.shipping.city}.
+          {placed.shipping.address}, {placed.shipping.city} {placed.shipping.postalCode},{' '}
+          {placed.shipping.country}.
         </p>
 
         <ul className="mt-4 divide-y divide-slate-200 text-sm">
@@ -156,6 +162,34 @@ export default function CheckoutPage() {
               </div>
             )
           })}
+
+          <div>
+            <label htmlFor="country" className="block text-sm font-medium">
+              Country
+            </label>
+            <select
+              id="country"
+              name="country"
+              autoComplete="country-name"
+              value={values.country}
+              onChange={handleChange}
+              aria-invalid={errors.country !== undefined}
+              aria-describedby={errors.country ? 'country-error' : undefined}
+              className={inputClass(errors.country !== undefined)}
+            >
+              <option value="">Select country</option>
+              {COUNTRIES.map((country) => (
+                <option key={country} value={country}>
+                  {country}
+                </option>
+              ))}
+            </select>
+            {errors.country && (
+              <p id="country-error" className="mt-1 text-sm text-red-600">
+                {errors.country}
+              </p>
+            )}
+          </div>
 
           <button
             type="submit"

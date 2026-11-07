@@ -33,8 +33,11 @@ function isShippingInfo(value: unknown): value is ShippingInfo {
     isRecord(value) &&
     typeof value.fullName === 'string' &&
     typeof value.email === 'string' &&
+    typeof value.phone === 'string' &&
     typeof value.address === 'string' &&
-    typeof value.city === 'string'
+    typeof value.city === 'string' &&
+    typeof value.postalCode === 'string' &&
+    typeof value.country === 'string'
   )
 }
 

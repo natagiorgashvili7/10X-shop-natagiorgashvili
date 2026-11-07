@@ -55,7 +55,7 @@ export default function OrdersPage() {
           ))}
         </ul>
         <p className="mt-3 text-sm text-slate-600">
-          Ship to: {order.shipping.fullName}, {order.shipping.address}, {order.shipping.city}
+          Ship to: {order.shipping.fullName}, {order.shipping.address}, {order.shipping.city}, {order.shipping.country}
         </p>
         <p className="mt-2 text-lg font-bold">Total {formatPrice(order.total)}</p>
       </section>
